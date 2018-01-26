@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+	integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<title>The MINT - Door Controller</title>
+<style>
+html, body, .fullHeight {
+	height: 100%;
+}
+
+body {
+	padding-top: 70px;
+}
+
+.box {
+	border: 1px solid #eee;
+	border-radius: 10px;
+	margin-bottom: 20px;
+	padding: 20px;
+}
+
+.camera {
+	margin: 20px;
+	width: 300px;
+}
+</style>
+</head>
+<body>
+
+	<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+		<a class="navbar-brand" href="#">The MINT - Door Controller</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</nav>
+
+	<div class="container-fluid fullHeight">
+		<div class="row fullHeight">
+			<div class="col">
+				<div class="container">
+					<div class="row">
+						<div class="col box">
+							<h2>Status</h2>
+							<ul>
+								<li>Member Access <span id="js-memberAccessEnabled" class="badge badge-secondary">...</span></li>
+								<li>Time of Day <span id="js-timeOfDay" class="badge badge-secondary">...</span></li>
+								<li>Door Hardware <span class="badge badge-secondary">Unimplemented</span></li>
+								<li><span id="js-memberCount">...</span> Members Loaded <span id="js-memberCountStatus"
+									class="badge badge-secondary">...</span></li>
+								<li>Members Loaded <span id="js-membersLoaded" class="badge badge-secondary">...</span></li>
+								<li>Member Data Age <span id="js-memberAge" class="badge badge-secondary">...</span></li>
+								<li>Milestone Integration <span class="badge badge-secondary">Unimplemented</span></li>
+							</ul>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col box">
+							<h2>Actions</h2>
+							<img class="camera" src="fake.png"> <br>
+							<button id="js-buttonUnlock" type="button" class="btn btn-primary">Unlock for 30 Seconds</button>
+							<button id="js-buttonDisable" type="button" class="btn btn-danger">Disable Member Access</button>
+							<button id="js-buttonEnable" type="button" class="btn btn-success">Enable Member Access</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col fullHeight" style="overflow-y: auto">
+				<table class="table fullHeight">
+					<thead>
+						<tr>
+							<th scope="col">Time</th>
+							<th scope="col">Name</th>
+							<th scope="col">Action</th>
+						</tr>
+					</thead>
+					<tbody id="js-logBody">
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+		integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+		integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+		integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"
+		integrity="sha256-obZACiHd7gkOk9iIL/pimWMTJ4W/pBsKu+oZnSeBIek=" crossorigin="anonymous"></script>
+
+	<script src="index.js"></script>
+</body>
+</html>
