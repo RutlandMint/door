@@ -14,7 +14,9 @@ public class DoorController {
 	private static final Logger log = LoggerFactory.getLogger(DoorController.class);
 
 	public static void main(final String[] args) throws Exception {
-		final DoorController dc = new DoorController(new File("/etc/door.json"));
+		final String configFile = args.length == 1 ? args[0] : "/etc/door.json";
+		log.info("Loading config file {}", configFile);
+		final DoorController dc = new DoorController(new File(configFile));
 		dc.start();
 	}
 
@@ -60,7 +62,13 @@ public class DoorController {
 	private void start() throws Exception {
 		db.start();
 		dh.start();
-		ws.start();
+		try {
+			ws.start();
+		} catch (Exception e) {
+			log.error("Unable to start server", e);
+			ws.stop();
+		}
+		ws.join();
 	}
 
 }

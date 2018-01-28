@@ -1,0 +1,8 @@
+{
+	"wildApricot": {
+		"apiKey": "XXX"
+	},
+	"accessLogs": "/var/log/door/",
+	"memberCache": "/var/lib/doorMemberCache.ser",
+	"port": "com1"
+}
