@@ -44,9 +44,14 @@ public class AccessController {
 	public final AccessDenied NO_AGREEMENT = new AccessDenied("No Member Agreement on File");
 	public final AccessDenied NO_NIGHT = new AccessDenied("No Nighttime Access");
 	public final AccessDenied INACTIVE = new AccessDenied("Member Inactive");
-	public final AccessGranted GRANTED = new AccessGranted("");
+	public final AccessDenied DISABLED = new AccessDenied("Member Access Disabled");
+	public final AccessGranted GRANTED = new AccessGranted("ok");
+	public final AccessGranted STAFF = new AccessGranted("MINT Staff");
 
 	public AccessResult isAccessGranted(final Member m) {
+		if ( "MINT Staff".equals(m.level) ) {
+			return STAFF;
+		}
 		if (!m.signedWaiver) {
 			return NO_WAIVER;
 		}
@@ -58,6 +63,9 @@ public class AccessController {
 		}
 		if (isNightMode() && !m.afterHoursAccess) {
 			return NO_NIGHT;
+		}
+		if (!memberAccessEnabled) {
+			return DISABLED;
 		}
 		return GRANTED;
 	}

@@ -9,17 +9,14 @@
 #define DebugLED  6
 
 //Strike State
-#define striketimeout 5000
+#define STRIKE_TIME 5000
 unsigned long striketimer = 0;
-
 
 //Card Reader State
 unsigned char cardReader_databits[MAX_BITS];    // stores all of the data bits
 unsigned char cardReader_bitCount;              // number of bits currently captured
 unsigned char cardReader_flagDone;              // goes low when data is currently being captured
 unsigned int cardReader_weigand_counter;        // countdown until we assume there are no more bits
-
-
 
 void setup() {
   cardReader_setup();
@@ -38,9 +35,20 @@ void setup() {
   Serial.println("#Starup");
 }
 
+long status = 0;
 void loop() {
-  if (striketimer == millis()) {
+  if (striketimer && striketimer <= millis()) {
     lock();
+    striketimer = 0;
+  }
+  char in = Serial.read();
+  if (in == 'U' ) {
+    unlock();
+  }
+
+  if (millis() == status ) {
+    status = millis() + 10000;
+    Serial.println("STATUS=OK");
   }
   cardReader_loop();
 }
@@ -60,7 +68,7 @@ void unlock() {
   digitalWrite(CardValidLED, HIGH);
   digitalWrite(Input1LED, HIGH);
   digitalWrite(A1, HIGH);
-  striketimer = striketimeout + millis();
+  striketimer = STRIKE_TIME + millis();
 }
 
 void cardRead(unsigned long facilityCode, unsigned long cardCode) {
@@ -68,14 +76,16 @@ void cardRead(unsigned long facilityCode, unsigned long cardCode) {
   unsigned long int card = (facilityCode * 100000) + cardCode;
 
   //Hardcoded 24 hour access
-  if (card == 10010001 //Pete
-      || card == 10010100 //Dan
-      || card == 10010084 //karen
-      || card == 10010081 //Bill
-      || card == 19233338 //forest
+  if ( false //
+       || card == 10010001 //Pete
+       || card == 10010100 //Dan
+       || card == 10010084 //karen
+       || card == 10010081 //Bill
+       || card == 19233338 //forest
      ) {
-    Serial.print("#OVERRIDE=");
-    Serial.println(card);
+    //Serial.print("#OVERRIDE=");
+    //Serial.println(card);
+    //unlock();
   }
   Serial.print("CARD=");
   Serial.println(card);
@@ -83,7 +93,7 @@ void cardRead(unsigned long facilityCode, unsigned long cardCode) {
 
 void cardReader_ISR_INT0() // interrupt that happens when INTO goes low (0 bit)
 {
-  cardReader_databits[cardReader_bitCount] = 0;
+  //cardReader_databits[cardReader_bitCount] = 0;
   cardReader_bitCount++;
   cardReader_flagDone = 0;
   cardReader_weigand_counter = WEIGAND_WAIT_TIME;
@@ -155,6 +165,7 @@ void cardReader_loop() {
     }
 
     // cleanup and get ready for the next card
+    cardReader_bitCount = 0;
     for (i = 0; i < MAX_BITS; i++) {
       cardReader_databits[i] = 0;
     }

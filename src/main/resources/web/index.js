@@ -26,6 +26,14 @@ $(function() {
 			} else {
 				$("#js-timeOfDay").attr("class", "badge badge-info").text("Day");
 			}
+			if ( res.door.status == "OK"){
+				$("#js-door").attr("class", "badge badge-success")
+				$("#js-door").text(formatSeconds(res.door.statusAgeSeconds));
+			} else {
+				$("#js-door").attr("class", "badge badge-danger")
+				$("#js-door").text(res.door.status);
+			}
+
 			if (res.accessControl.memberAccessEnabled) {
 				$("#js-memberAccessEnabled").attr("class", "badge badge-success").text("Enabled");
 				$("#js-buttonDisable").removeAttr("disabled");

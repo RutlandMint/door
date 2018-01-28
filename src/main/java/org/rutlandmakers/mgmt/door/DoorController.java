@@ -46,7 +46,7 @@ public class DoorController {
 					final Member m = om.get();
 					final AccessResult res = ac.isAccessGranted(m);
 					if (res.isGranted()) {
-						al.log(m.name, "Access Granted");
+						al.log(m.name, "Access Granted: " + res.message);
 						dh.unlockBriefly();
 					} else {
 						al.log(m.name, "Access Denied: " + res.message);
