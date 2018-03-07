@@ -2,7 +2,7 @@ $(function() {
 
 	function loadAccessLog() {
 		$.ajax({
-			url : '/accessLog.json',
+			url : 'accessLog.json',
 			type : "GET",
 			dataType : "json"
 		}).then(function(res) {
@@ -17,7 +17,7 @@ $(function() {
 
 	function loadStatus() {
 		$.ajax({
-			url : '/status.json',
+			url : 'status.json',
 			type : "GET",
 			dataType : "json"
 		}).then(function(res) {
@@ -80,21 +80,21 @@ $(function() {
 
 	$("#js-buttonDisable").click(function() {
 		$.ajax({
-			url : '/disable.do',
+			url : 'disable.do',
 			type : "POST"
 		}).then(load);
 	});
 
 	$("#js-buttonEnable").click(function() {
 		$.ajax({
-			url : '/enable.do',
+			url : 'enable.do',
 			type : "POST"
 		}).then(load);
 	});
 
 	$("#js-buttonUnlock").click(function() {
 		$.ajax({
-			url : '/openBriefly.do',
+			url : 'openBriefly.do',
 			type : "POST"
 		}).then(load);
 	});
