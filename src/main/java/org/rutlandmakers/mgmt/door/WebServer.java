@@ -136,20 +136,21 @@ public class WebServer extends Server {
 				if (!baseRequest.getMethod().equals("POST")) {
 					return;
 				}
+				final String user = request.getHeader("X-Email");
 				switch (target) {
 				case "/openBriefly.do":
-					al.log("Admin", "Opened Door Remotely");
+					al.log(user, "Opened Door Remotely");
 					dh.unlockBriefly();
 					break;
 				case "/disable.do":
 					if (ac.isMemberAccessEnabled()) {
-						al.log("Admin", "Disabled Member Access");
+						al.log(user, "Disabled Member Access");
 					}
 					ac.setMemberAccessEnabled(false);
 					break;
 				case "/enable.do":
 					if (!ac.isMemberAccessEnabled()) {
-						al.log("Admin", "Enabled Member Access");
+						al.log(user, "Enabled Member Access");
 					}
 					ac.setMemberAccessEnabled(true);
 					break;
