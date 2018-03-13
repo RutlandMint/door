@@ -40,13 +40,13 @@ public class AccessController {
 		};
 	}
 
-	public final AccessDenied NO_WAIVER = new AccessDenied("No Waiver on File");
-	public final AccessDenied NO_AGREEMENT = new AccessDenied("No Member Agreement on File");
-	public final AccessDenied NO_NIGHT = new AccessDenied("No Nighttime Access");
-	public final AccessDenied INACTIVE = new AccessDenied("Member Inactive");
-	public final AccessDenied DISABLED = new AccessDenied("Member Access Disabled");
-	public final AccessGranted GRANTED = new AccessGranted("ok");
-	public final AccessGranted STAFF = new AccessGranted("MINT Staff");
+	public static final AccessDenied NO_WAIVER = new AccessDenied("No Waiver on File");
+	public static final AccessDenied NO_AGREEMENT = new AccessDenied("No Member Agreement on File");
+	public static final AccessDenied NO_NIGHT = new AccessDenied("No Nighttime Access");
+	public static final AccessDenied INACTIVE = new AccessDenied("Member Inactive");
+	public static final AccessDenied DISABLED = new AccessDenied("Member Access Disabled");
+	public static final AccessGranted GRANTED = new AccessGranted("ok");
+	public static final AccessGranted STAFF = new AccessGranted("MINT Staff");
 
 	public AccessResult isAccessGranted(final Member m) {
 		if ( "MINT Staff".equals(m.level) ) {

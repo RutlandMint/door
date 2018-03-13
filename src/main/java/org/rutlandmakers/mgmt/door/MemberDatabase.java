@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -112,6 +114,10 @@ public class MemberDatabase extends Thread {
 			}
 
 		}
+	}
+
+	public synchronized Set<Member> getMembers() {
+		return Collections.unmodifiableSet(new HashSet<>(members));
 	}
 
 	public synchronized Optional<Member> getMemberByAccessCard(final String cardNum) {

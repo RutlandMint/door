@@ -20,13 +20,15 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.resource.Resource;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.rutlandmakers.mgmt.door.AccessController.AccessResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WebServer extends Server {
 	private static final Logger log = LoggerFactory.getLogger(WebServer.class);
 
-	public WebServer(final DoorHardware dh, final MemberDatabase db, final AccessLog al, final AccessController ac, final DoorController dc) {
+	public WebServer(final DoorHardware dh, final MemberDatabase db, final AccessLog al, final AccessController ac,
+			final DoorController dc) {
 		super(8081);
 
 		// Serves static resources
@@ -84,6 +86,44 @@ public class WebServer extends Server {
 							a.put(e);
 						});
 					}
+					response.getWriter().print(ret.toString());
+					baseRequest.setHandled(true);
+				}
+			}
+		};
+
+		// Serves status at /members.json
+		final Handler membersHandler = new AbstractHandler() {
+			@Override
+			public void handle(final String target, final Request baseRequest, final HttpServletRequest request,
+					final HttpServletResponse response) throws IOException, ServletException {
+				if (target.equals("/members.json")) {
+					response.setStatus(200);
+					response.setContentType("application/json");
+					final JSONObject ret = new JSONObject();
+					final JSONArray members = new JSONArray();
+					ret.put("members", members);
+
+					db.getMembers().stream().sorted((a, b) -> {
+						return b.name.compareTo(a.name);
+					}).forEach(m -> {
+						final JSONObject mj = new JSONObject();
+						mj.put("name", m.name);
+						mj.put("email", m.email);
+						mj.put("keyCardNumber", m.keyCardNumber);
+						mj.put("level", m.level);
+						mj.put("status", m.status);
+						mj.put("afterHoursAccess", m.afterHoursAccess);
+						mj.put("signedWaiver", m.signedWaiver);
+						mj.put("signedAgreement", m.signedAgreement);
+						final AccessResult res = ac.isAccessGranted(m);
+						final boolean ok = (res == AccessController.GRANTED || res == AccessController.STAFF);
+						mj.put("accessGranted", ok);
+						if (!ok)
+							mj.put("denyMessage", ac.isAccessGranted(m).message);
+						members.put(mj);
+					});
+
 					response.getWriter().print(ret.toString());
 					baseRequest.setHandled(true);
 				}
@@ -169,7 +209,7 @@ public class WebServer extends Server {
 		// Add the ResourceHandler to the server.
 		final HandlerList handlers = new HandlerList();
 		handlers.setHandlers(new Handler[] { resourceHandler, statusHandler, actionHandler, logHandler, accessHandler,
-				new DefaultHandler() });
+				membersHandler, new DefaultHandler() });
 		setHandler(handlers);
 
 	}
