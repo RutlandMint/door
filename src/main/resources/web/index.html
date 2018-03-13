@@ -24,7 +24,11 @@ body {
 
 .camera {
 	margin: 20px;
-	width: 300px;
+	width: 500px;
+	height: 375px;
+	display: block;
+	overflow: hidden;
+	border: solid 1px #ddd;
 }
 
 fieldset {
@@ -76,7 +80,7 @@ fieldset>legend {
 							<h2>Actions</h2>
 							<fieldset class="form-group">
 								<legend>Let Someone In</legend>
-								<img class="camera" src="fake.png"> <br>
+								<img id="js-image" class="camera" src="image.jpg"> <br>
 								<button id="js-buttonUnlock" type="button" class="btn btn-primary">Unlock for 30 Seconds</button>
 							</fieldset>
 							<fieldset class="form-group">

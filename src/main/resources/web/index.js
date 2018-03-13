@@ -73,6 +73,11 @@ $(function() {
 		});
 	}
 
+	function reloadImage(){
+		let $i = $("#js-image");
+		$i.attr("src", "image.jpg?" + new Date().getTime());
+	}
+	
 	function load() {
 		loadStatus();
 		loadAccessLog();
@@ -110,7 +115,8 @@ $(function() {
 	});
 
 	load();
-	setInterval(loadAccessLog, 1000);
+	setInterval(loadAccessLog, 2000);
+	setInterval(reloadImage, 3000);
 	setInterval(loadStatus, 30000);
 });
 
