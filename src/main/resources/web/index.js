@@ -98,6 +98,16 @@ $(function() {
 			type : "POST"
 		}).then(load);
 	});
+	
+	$("#js-buttonTestCard").click(function() {
+		$.ajax({
+			url : 'test.do',
+			type : "POST",
+			data: {
+				testCard: $("#js-testCardInput").val()
+			} 
+		}).then(load);
+	});
 
 	load();
 	setInterval(loadAccessLog, 1000);

@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class WebServer extends Server {
 	private static final Logger log = LoggerFactory.getLogger(WebServer.class);
 
-	public WebServer(final DoorHardware dh, final MemberDatabase db, final AccessLog al, final AccessController ac) {
+	public WebServer(final DoorHardware dh, final MemberDatabase db, final AccessLog al, final AccessController ac, final DoorController dc) {
 		super(8081);
 
 		// Serves static resources
@@ -153,6 +153,11 @@ public class WebServer extends Server {
 						al.log(user, "Enabled Member Access");
 					}
 					ac.setMemberAccessEnabled(true);
+					break;
+				case "/test.do":
+					final String card = request.getParameter("testCard");
+					al.log(user, "Performing test of " + card + "...");
+					dc.listener.accept(card);
 					break;
 				}
 
