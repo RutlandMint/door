@@ -10,6 +10,7 @@ public class Member implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public final long id;
 	public final String name;
 	public final String email;
 	public final String keyCardNumber;
@@ -38,6 +39,7 @@ public class Member implements Serializable {
 	public Member(final JSONObject member) {
 		name = member.getString("DisplayName");
 		email = member.getString("Email");
+		id = member.getLong("Id");
 		level = member.getJSONObject("MembershipLevel").getString("Name");
 		keyCardNumber = findField("Key Card Number", member).map(f -> f.optString("Value")).orElse(null);
 		afterHoursAccess = findField("After Hours Access", member).map(f -> f.getJSONArray("Value").length() > 0)

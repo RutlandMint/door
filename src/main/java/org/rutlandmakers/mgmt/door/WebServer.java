@@ -110,6 +110,7 @@ public class WebServer extends Server {
 						final JSONObject mj = new JSONObject();
 						mj.put("name", m.name);
 						mj.put("email", m.email);
+						mj.put("id", m.id);
 						mj.put("keyCardNumber", m.keyCardNumber);
 						mj.put("level", m.level);
 						mj.put("status", m.status);
