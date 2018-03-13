@@ -155,7 +155,7 @@ public class WebServer extends Server {
 					ac.setMemberAccessEnabled(true);
 					break;
 				case "/test.do":
-					final String card = request.getParameter("testCard");
+					final String card = request.getParameter("testCard").trim();
 					al.log(user, "Performing test of " + card + "...");
 					dc.listener.accept(card);
 					break;
