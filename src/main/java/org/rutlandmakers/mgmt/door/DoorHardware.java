@@ -15,10 +15,17 @@ import com.fazecast.jSerialComm.SerialPort;
 public class DoorHardware extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(DoorHardware.class);
 	private final Set<Consumer<String>> cardListeners = new HashSet<>();
+	private final Set<Consumer<DoorState>> doorListeners = new HashSet<>();
 	private final SerialPort comPort;
 	private String status;
 	private long statusAge = 0;
 
+	private DoorState lastDoorState = DoorState.CLOSED;
+	
+	public enum DoorState {
+		OPEN, CLOSED;
+	}
+	
 	public DoorHardware(final String portName) {
 		setName("Door Hardware Thread");
 		setDaemon(true);
@@ -52,18 +59,32 @@ public class DoorHardware extends Thread {
 	}
 
 	public void process(final String line) {
-		if (line.startsWith("#")) {
-			log.info("Door Debug: {}", line);
-		} else if (line.startsWith("STATUS=")) {
-			status = line.substring(7);
-			statusAge = System.currentTimeMillis();
-		} else if (line.startsWith("CARD=")) {
-			final String card = line.substring(5);
-			log.info("Card Read: {}", card);
-			cardListeners.forEach(c -> c.accept(card));
-		} else {
-			log.warn("Unrecognized output from door {}", line);
+		try {
+			if (line.startsWith("#")) {
+				log.info("Door Debug: {}", line);
+			} else if (line.startsWith("STATUS=")) {
+				status = line.substring(7);
+				statusAge = System.currentTimeMillis();
+			} else if (line.startsWith("CARD=")) {
+				final String card = line.substring(5);
+				log.info("Card Read: {}", card);
+				cardListeners.forEach(c -> c.accept(card));
+			} else if (line.startsWith("DOOR=")) {
+				final DoorState newState = DoorState.valueOf(line.substring(5));
+				if (newState != lastDoorState)
+					doorListeners.forEach(l -> l.accept(newState));
+				lastDoorState = newState;
+			} else {
+				log.warn("Unrecognized output from door {}", line);
+			}
+		} catch (Exception e) {
+			log.error("Error in process(\"{}\")", line, e);
 		}
+	}
+	
+	
+	public void addDoorStateChangeListener(final Consumer<DoorState> listener) {
+		doorListeners.add(listener);
 	}
 
 	public void addCardListener(final Consumer<String> listener) {

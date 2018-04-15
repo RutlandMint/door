@@ -60,6 +60,14 @@ public class DoorController {
 		};
 
 		dh.addCardListener(listener);
+		
+		dh.addDoorStateChangeListener(ds -> {
+			try {
+				al.log("[Front Door]", ds.toString());
+			} catch (final Exception e) {
+				log.error("Error occured logging door state", e);
+			}
+		});
 
 	}
 

@@ -28,6 +28,7 @@ void setup() {
   pinMode(Input2LED, OUTPUT);
   pinMode(DebugLED, OUTPUT);
 
+  pinMode(4, INPUT);
   pinMode(A1, OUTPUT);
 
   Serial.begin(115200);
@@ -36,6 +37,8 @@ void setup() {
 }
 
 long status = 0;
+long door = 0;
+
 void loop() {
   if (striketimer && striketimer <= millis()) {
     lock();
@@ -49,6 +52,15 @@ void loop() {
   if (millis() == status ) {
     status = millis() + 10000;
     Serial.println("STATUS=OK");
+    if (digitalRead(4)){
+      Serial.println("DOOR=CLOSED");
+    }
+  }
+  if ( millis() == door ){
+    door = millis() + 500;
+    if (!digitalRead(4)){
+      Serial.println("DOOR=OPEN");
+    }
   }
   cardReader_loop();
 }
@@ -81,11 +93,19 @@ void cardRead(unsigned long facilityCode, unsigned long cardCode) {
        || card == 10010100 //Dan
        || card == 10010084 //karen
        || card == 10010081 //Bill
+       || card == 10010076 //Jeff
        || card == 19233338 //forest
      ) {
-    //Serial.print("#OVERRIDE=");
-    //Serial.println(card);
-    //unlock();
+    Serial.print("#SUPER_USER=");
+    Serial.println(card);
+    unlock();
+  } else if (digitalRead(4)) {
+    if (card >= 10010000 && card <= 10010099) {
+      //If Input 1, set all cards in box valid
+      Serial.print("#OVERRIDE=");
+      Serial.println(card);
+      unlock();
+    }
   }
   Serial.print("CARD=");
   Serial.println(card);
@@ -161,7 +181,7 @@ void cardReader_loop() {
       cardRead(facilityCode, cardCode);
     } else {
       // you can add other formats if you want!
-      Serial.println("#Unable to decode.");
+      //Serial.println("#Unable to decode.");
     }
 
     // cleanup and get ready for the next card
