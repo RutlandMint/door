@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class WebServer extends Server {
 	private static final Logger log = LoggerFactory.getLogger(WebServer.class);
 
-	public WebServer(final DoorHardware dh, final MemberDatabase db, final AccessLog al, final AccessController ac,
+	public WebServer(final DoorHardware dh, final MemberDatabase db, final FileEventLog fl, final GoogleSheetEventLog gl, final EventLog el, final AccessController ac,
 			final DoorController dc) {
 		super(8081);
 
@@ -143,6 +143,7 @@ public class WebServer extends Server {
 					ret.put("database", db.getStatus());
 					ret.put("door", dh.getStatus());
 					ret.put("accessControl", ac.getStatus());
+					ret.put("google", gl.getStatus());
 					response.getWriter().print(ret.toString());
 					baseRequest.setHandled(true);
 				}
@@ -156,13 +157,13 @@ public class WebServer extends Server {
 					final HttpServletResponse response) throws IOException, ServletException {
 				if (target.equals("/accessLog.json")) {
 					response.setHeader("Cache-Control", "must-revalidate");
-					if (request.getDateHeader("If-Modified-Since") >= al.getLastModified()) {
+					if (request.getDateHeader("If-Modified-Since") >= fl.getLastModified()) {
 						response.setStatus(304);
 					} else {
 						response.setStatus(200);
 						response.setContentType("application/json");
-						response.setDateHeader("Last-Modified", al.getLastModified());
-						response.getWriter().print(al.getLog().toString());
+						response.setDateHeader("Last-Modified", fl.getLastModified());
+						response.getWriter().print(fl.getLog().toString());
 					}
 					baseRequest.setHandled(true);
 				}
@@ -180,24 +181,24 @@ public class WebServer extends Server {
 				final String user = request.getHeader("X-Email");
 				switch (target) {
 				case "/openBriefly.do":
-					al.log(user, "Opened Door Remotely");
+					el.admin(user, "Opened Door Remotely");
 					dh.unlockBriefly();
 					break;
 				case "/disable.do":
 					if (ac.isMemberAccessEnabled()) {
-						al.log(user, "Disabled Member Access");
+						el.admin(user, "Disabled Member Access");
 					}
 					ac.setMemberAccessEnabled(false);
 					break;
 				case "/enable.do":
 					if (!ac.isMemberAccessEnabled()) {
-						al.log(user, "Enabled Member Access");
+						el.admin(user, "Enabled Member Access");
 					}
 					ac.setMemberAccessEnabled(true);
 					break;
 				case "/test.do":
 					final String card = request.getParameter("testCard").trim();
-					al.log(user, "Performing test of " + card + "...");
+					el.admin(user, "Performing test of " + card + "...");
 					dc.listener.accept(card);
 					break;
 				}

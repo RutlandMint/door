@@ -23,35 +23,38 @@ public class DoorController {
 
 	private final DoorHardware dh;
 	private final MemberDatabase db;
-	private final AccessLog al;
 	private final AccessController ac;
 	private final WebServer ws;
+	private final EventLog al;
 	final Consumer<String> listener;
 
 	public DoorController(final File configFile) throws Exception {
 		final JSONObject config = new JSONObject(new JSONTokener(new FileInputStream(configFile)));
 
-		al = new AccessLog(config.getString("accessLogs"));
+		final FileEventLog fl = new FileEventLog(config.getString("accessLogs"));
+		final GoogleSheetEventLog gl = new GoogleSheetEventLog(config.getJSONObject("google"));
+		al = new EventLog.Splitter(fl, gl);
+
 		dh = new DoorHardware(config.getString("port"));
 		db = new MemberDatabase(//
 				new WildApricot(config.getJSONObject("wildApricot").getString("apiKey")), //
 				new File(config.getString("memberCache")));
 		ac = new AccessController();
-		ws = new WebServer(dh, db, al, ac, this);
+		ws = new WebServer(dh, db, fl, gl, al, ac, this);
 
 		this.listener = cardNum -> {
 			try {
 				final Optional<Member> om = db.getMemberByAccessCard(cardNum);
 				if (!om.isPresent()) {
-					al.log("Unknown Card [" + cardNum + "]", "Denied");
+					al.unknownCard(cardNum);
 				} else {
 					final Member m = om.get();
 					final AccessResult res = ac.isAccessGranted(m);
 					if (res.isGranted()) {
-						al.log(m.name, "Access Granted: " + res.message);
+						al.accessGranted(m, res);
 						dh.unlockBriefly();
 					} else {
-						al.log(m.name, "Access Denied: " + res.message);
+						al.accessDenied(m, res);
 					}
 				}
 			} catch (final Exception e) {
@@ -60,10 +63,10 @@ public class DoorController {
 		};
 
 		dh.addCardListener(listener);
-		
+
 		dh.addDoorStateChangeListener(ds -> {
 			try {
-				al.log("[Front Door]", ds.toString());
+				al.frontDoor(ds);
 			} catch (final Exception e) {
 				log.error("Error occured logging door state", e);
 			}

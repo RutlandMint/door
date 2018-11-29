@@ -10,8 +10,10 @@ import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.rutlandmakers.mgmt.door.AccessController.AccessResult;
+import org.rutlandmakers.mgmt.door.DoorHardware.DoorState;
 
-public class AccessLog {
+public class FileEventLog implements EventLog {
 
 	private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	private final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
@@ -22,7 +24,7 @@ public class AccessLog {
 		return new File(dir + "/door-" + DATE_FORMAT.format(new Date()) + ".log");
 	}
 
-	public AccessLog(final String dir) throws IOException {
+	public FileEventLog(final String dir) throws IOException {
 		this.dir = dir;
 		final File d = new File(dir);
 		if (!d.exists()) {
@@ -35,7 +37,27 @@ public class AccessLog {
 		}
 	}
 
-	public synchronized void log(final String who, final String action) throws IOException {
+	public void unknownCard(String cardNum) throws IOException {
+		log("Unknown Card [" + cardNum + "]", "Denied");
+	}
+
+	public void accessGranted(Member member, AccessResult res) throws IOException {
+		log(member.name, "Access Granted: " + res.message);
+	}
+
+	public void accessDenied(Member member, AccessResult res) throws IOException {
+		log(member.name, "Access Denied: " + res.message);
+	}
+
+	public void frontDoor(DoorState ds) throws IOException {
+		log("[Front Door]", ds.toString());
+	}
+
+	public void admin(final String user, final String action) throws IOException {
+		log(user, action);
+	}
+
+	private synchronized void log(final String who, final String action) throws IOException {
 		try (FileWriter w = new FileWriter(getCurrentFile(), true)) {
 			w.write(TIME_FORMAT.format(new Date()) + "\t" + who + "\t" + action + "\n");
 			lastModified = System.currentTimeMillis();
@@ -47,7 +69,7 @@ public class AccessLog {
 	}
 
 	public long getLastModified() {
-		return 1000*(lastModified/1000);
+		return 1000 * (lastModified / 1000);
 	}
 
 	private synchronized JSONObject getLog(final File f) throws IOException {

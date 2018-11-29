@@ -33,6 +33,15 @@ $(function() {
 				$("#js-door").attr("class", "badge badge-danger")
 				$("#js-door").text(res.door.status);
 			}
+			
+			$("#js-google").text(res.google.queueSize);
+			if ( res.google.queueSize == 0 ){
+				$("#js-google").attr("class", "badge badge-success");
+			} else if ( res.google.queueSize == 1 ){
+				$("#js-google").attr("class", "badge badge-warning");
+			} else {
+				$("#js-google").attr("class", "badge badge-danger");
+			}
 
 			if (res.accessControl.memberAccessEnabled) {
 				$("#js-memberAccessEnabled").attr("class", "badge badge-success").text("Enabled");
