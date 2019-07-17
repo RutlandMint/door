@@ -13,9 +13,10 @@ import org.rutlandmint.mgmt.door.log.FileEventLog;
 import org.rutlandmint.mgmt.door.log.GoogleSheetEventLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 @Controller
+@Secured("ROLE_STAFF")
 public class ApiController {
 
 	private @Autowired MemberDatabase db;
@@ -83,35 +85,35 @@ public class ApiController {
 		}
 	}
 
-	@RequestMapping("openBriefly.do")
+	@RequestMapping(method = RequestMethod.POST, path = "openBriefly.do")
 	@ResponseStatus(HttpStatus.OK)
-	void openBriefly(@RequestHeader("X-Email") final String user) throws IOException {
-		el.admin(user, "Opened Door Remotely");
+	void openBriefly() throws IOException {
+		el.admin("Opened Door Remotely");
 		dh.unlockBriefly();
 	}
 
-	@RequestMapping("disable.do")
+	@RequestMapping(method = RequestMethod.POST, path = "disable.do")
 	@ResponseStatus(HttpStatus.OK)
-	void disableMemberAccess(@RequestHeader("X-Email") final String user) throws IOException {
+	void disableMemberAccess() throws IOException {
 		if (ac.isMemberAccessEnabled()) {
-			el.admin(user, "Disabled Member Access");
+			el.admin("Disabled Member Access");
 		}
 		ac.setMemberAccessEnabled(false);
 	}
 
-	@RequestMapping("enable.do")
+	@RequestMapping(method = RequestMethod.POST, path = "enable.do")
 	@ResponseStatus(HttpStatus.OK)
-	void enableMemberAccess(@RequestHeader("X-Email") final String user) throws IOException {
+	void enableMemberAccess() throws IOException {
 		if (!ac.isMemberAccessEnabled()) {
-			el.admin(user, "Enabled Member Access");
+			el.admin("Enabled Member Access");
 		}
 		ac.setMemberAccessEnabled(true);
 	}
 
-	@RequestMapping("test.do")
+	@RequestMapping(method = RequestMethod.POST, path = "test.do")
 	@ResponseStatus(HttpStatus.OK)
-	void testCard(@RequestHeader("X-Email") final String user, @RequestParam final String testCard) throws IOException {
-		el.admin(user, "Performing test of " + testCard.trim() + "...");
+	void testCard(@RequestParam final String testCard) throws IOException {
+		el.admin("Performing test of " + testCard.trim() + "...");
 		dc.listener.accept(testCard.trim());
 	}
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.rutlandmint.mgmt.door.AccessController.AccessResult;
 import org.rutlandmint.mgmt.door.DoorHardware.DoorState;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.rutlandmint.mgmt.door.Member;
 
 public interface EventLog {
@@ -15,5 +17,10 @@ public interface EventLog {
 
 	public void frontDoor(DoorState ds) throws IOException;
 
-	public void admin(final String user, final String action) throws IOException;
+	void admin(final String user, final String action) throws IOException;
+
+	public default void admin(final String action) throws IOException {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		admin(auth.getName(), action);
+	}
 }
