@@ -1,10 +1,15 @@
 package org.rutlandmint.mgmt.door.log;
 
+import java.io.IOException;
 import java.util.LinkedList;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -16,7 +21,8 @@ import ch.qos.logback.core.AppenderBase;
 // Serves last 100 log entries at /log.json
 @Controller
 public class LogController {
-
+	private @Autowired FileEventLog fl;
+	
 	final LinkedList<ILoggingEvent> logBuffer = new LinkedList<>();
 
 	{
@@ -52,6 +58,17 @@ public class LogController {
 			});
 		}
 		return a;
+	}
+
+	@RequestMapping("accessLog.json")
+	@ResponseBody
+	JSONObject getAccessLog(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+		if (request.getDateHeader("If-Modified-Since") >= fl.getLastModified()) {
+			response.setStatus(304);
+			return null;
+		} else {
+			return fl.getLog();
+		}
 	}
 
 }
