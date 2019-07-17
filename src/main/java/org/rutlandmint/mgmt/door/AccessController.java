@@ -1,9 +1,11 @@
-package org.rutlandmakers.mgmt.door;
+package org.rutlandmint.mgmt.door;
 
 import java.util.Calendar;
 
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AccessController {
 
 	private boolean memberAccessEnabled = true;
@@ -26,7 +28,7 @@ public class AccessController {
 		@Override
 		public boolean isGranted() {
 			return true;
-		};
+		}
 	}
 
 	public static final class AccessDenied extends AccessResult {
@@ -37,7 +39,7 @@ public class AccessController {
 		@Override
 		public boolean isGranted() {
 			return false;
-		};
+		}
 	}
 
 	public static final AccessDenied NO_WAIVER = new AccessDenied("No Waiver on File");
@@ -49,7 +51,7 @@ public class AccessController {
 	public static final AccessGranted STAFF = new AccessGranted("MINT Staff");
 
 	public AccessResult isAccessGranted(final Member m) {
-		if ( "MINT Staff".equals(m.level) ) {
+		if ("MINT Staff".equals(m.level)) {
 			return STAFF;
 		}
 		if (!m.signedWaiver) {

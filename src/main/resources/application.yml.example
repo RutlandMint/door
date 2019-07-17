@@ -1,0 +1,21 @@
+wildApricot:
+        apiKey: REDACTED
+accessLogs: /var/log/door/
+memberCache: /var/door/doorMemberCache.ser
+port: /dev/ttyACM0
+google:
+        creds:
+                type: service_account
+                project_id: mint-door-controller
+                private_key_id: REDACTED
+                private_key: |
+                    -----BEGIN PRIVATE KEY-----
+                    MANY LINES REDACTED
+                    -----END PRIVATE KEY-----
+                client_email: REDACTED@mint-door-controller.iam.gserviceaccount.com
+                client_id: REDACTED
+                auth_uri: https://accounts.google.com/o/oauth2/auth
+                token_uri: https://oauth2.googleapis.com/token
+                auth_provider_x509_cert_url: https://www.googleapis.com/oauth2/v1/certs
+                client_x509_cert_url: https://www.googleapis.com/robot/v1/metadata/x509/mint-door%40mint-door-controller.iam.gserviceaccount.com
+        sheetID: REDACTED

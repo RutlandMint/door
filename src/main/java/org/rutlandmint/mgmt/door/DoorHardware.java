@@ -1,4 +1,4 @@
-package org.rutlandmakers.mgmt.door;
+package org.rutlandmint.mgmt.door;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,12 +6,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import javax.annotation.PostConstruct;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.fazecast.jSerialComm.SerialPort;
 
+@Component
 public class DoorHardware extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(DoorHardware.class);
 	private final Set<Consumer<String>> cardListeners = new HashSet<>();
@@ -21,12 +26,12 @@ public class DoorHardware extends Thread {
 	private long statusAge = 0;
 
 	private DoorState lastDoorState = DoorState.CLOSED;
-	
+
 	public enum DoorState {
 		OPEN, CLOSED;
 	}
-	
-	public DoorHardware(final String portName) {
+
+	public DoorHardware(@Value("${port}") final String portName) {
 		setName("Door Hardware Thread");
 		setDaemon(true);
 		log.info("Opening port {}", portName);
@@ -40,6 +45,13 @@ public class DoorHardware extends Thread {
 		log.info("Opened port {}", comPort);
 	}
 
+	@Override
+	@PostConstruct
+	public void start() {
+		super.start();
+	}
+
+	@Override
 	public void run() {
 		try {
 			final InputStream in = comPort.getInputStream();
@@ -53,8 +65,9 @@ public class DoorHardware extends Thread {
 					s.append((char) c);
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log.error("Error in hardware thread ", e);
+			status = "Hardware Thread Failed";
 		}
 	}
 
@@ -71,18 +84,18 @@ public class DoorHardware extends Thread {
 				cardListeners.forEach(c -> c.accept(card));
 			} else if (line.startsWith("DOOR=")) {
 				final DoorState newState = DoorState.valueOf(line.substring(5));
-				if (newState != lastDoorState)
+				if (newState != lastDoorState) {
 					doorListeners.forEach(l -> l.accept(newState));
+				}
 				lastDoorState = newState;
 			} else {
 				log.warn("Unrecognized output from door {}", line);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			log.error("Error in process(\"{}\")", line, e);
 		}
 	}
-	
-	
+
 	public void addDoorStateChangeListener(final Consumer<DoorState> listener) {
 		doorListeners.add(listener);
 	}

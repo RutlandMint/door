@@ -1,4 +1,4 @@
-package org.rutlandmakers.mgmt.door;
+package org.rutlandmint.mgmt.door.log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,9 +10,13 @@ import java.util.Date;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.rutlandmakers.mgmt.door.AccessController.AccessResult;
-import org.rutlandmakers.mgmt.door.DoorHardware.DoorState;
+import org.rutlandmint.mgmt.door.AccessController.AccessResult;
+import org.rutlandmint.mgmt.door.DoorHardware.DoorState;
+import org.rutlandmint.mgmt.door.Member;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FileEventLog implements EventLog {
 
 	private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -24,7 +28,7 @@ public class FileEventLog implements EventLog {
 		return new File(dir + "/door-" + DATE_FORMAT.format(new Date()) + ".log");
 	}
 
-	public FileEventLog(final String dir) throws IOException {
+	public FileEventLog(@Value("${accessLogs}") final String dir) throws IOException {
 		this.dir = dir;
 		final File d = new File(dir);
 		if (!d.exists()) {
@@ -37,22 +41,27 @@ public class FileEventLog implements EventLog {
 		}
 	}
 
-	public void unknownCard(String cardNum) throws IOException {
+	@Override
+	public void unknownCard(final String cardNum) throws IOException {
 		log("Unknown Card [" + cardNum + "]", "Denied");
 	}
 
-	public void accessGranted(Member member, AccessResult res) throws IOException {
+	@Override
+	public void accessGranted(final Member member, final AccessResult res) throws IOException {
 		log(member.name, "Access Granted: " + res.message);
 	}
 
-	public void accessDenied(Member member, AccessResult res) throws IOException {
+	@Override
+	public void accessDenied(final Member member, final AccessResult res) throws IOException {
 		log(member.name, "Access Denied: " + res.message);
 	}
 
-	public void frontDoor(DoorState ds) throws IOException {
+	@Override
+	public void frontDoor(final DoorState ds) throws IOException {
 		log("[Front Door]", ds.toString());
 	}
 
+	@Override
 	public void admin(final String user, final String action) throws IOException {
 		log(user, action);
 	}

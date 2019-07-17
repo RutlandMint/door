@@ -1,7 +1,6 @@
-package org.rutlandmakers.mgmt.door;
+package org.rutlandmint.mgmt.door.log;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
@@ -17,11 +16,13 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.rutlandmakers.mgmt.door.AccessController.AccessResult;
-import org.rutlandmakers.mgmt.door.DoorHardware.DoorState;
+import org.rutlandmint.mgmt.door.AccessController.AccessResult;
+import org.rutlandmint.mgmt.door.DoorHardware.DoorState;
+import org.rutlandmint.mgmt.door.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -30,9 +31,9 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
+@Component
 public class GoogleSheetEventLog extends Thread implements EventLog {
 	private static final Logger log = LoggerFactory.getLogger(GoogleSheetEventLog.class);
 	private static final String APPLICATION_NAME = "MINT Door Controller";
@@ -59,11 +60,36 @@ public class GoogleSheetEventLog extends Thread implements EventLog {
 	private final String sheetID;
 	private final BlockingDeque<Update> updates = new LinkedBlockingDeque<>(100);
 
-	public GoogleSheetEventLog(final JSONObject config) throws IOException, GeneralSecurityException {
+	public GoogleSheetEventLog(@Value("${google.sheetID}") final String sheetID, //
+			@Value("${google.creds.type}") final String type, //
+			@Value("${google.creds.project_id}") final String project_id, //
+			@Value("${google.creds.private_key_id}") final String private_key_id, //
+			@Value("${google.creds.private_key}") final String private_key, //
+			@Value("${google.creds.client_email}") final String client_email, //
+			@Value("${google.creds.client_id}") final String client_id, //
+			@Value("${google.creds.auth_uri}") final String auth_uri, //
+			@Value("${google.creds.token_uri}") final String token_uri, //
+			@Value("${google.creds.auth_provider_x509_cert_url}") final String auth_provider_x509_cert_url, //
+			@Value("${google.creds.client_x509_cert_url}") final String client_x509_cert_url //
+	) throws IOException, GeneralSecurityException {
 		this.setName("Google Sheets Update Thread");
 		this.setDaemon(true);
-		this.sheetID = config.getString("sheetID");
-		final InputStream credStream = new ByteArrayInputStream(config.getJSONObject("creds").toString().getBytes());
+		this.sheetID = sheetID;
+
+		// Stupid but easy
+		final JSONObject creds = new JSONObject();
+		creds.put("type", type);
+		creds.put("project_id", project_id);
+		creds.put("private_key_id", private_key_id);
+		creds.put("private_key", private_key);
+		creds.put("client_email", client_email);
+		creds.put("client_id", client_id);
+		creds.put("auth_uri", auth_uri);
+		creds.put("token_uri", token_uri);
+		creds.put("auth_provider_x509_cert_url", auth_provider_x509_cert_url);
+		creds.put("client_x509_cert_url", client_x509_cert_url);
+
+		final InputStream credStream = new ByteArrayInputStream(creds.toString().getBytes());
 		final HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		final GoogleCredential credential = GoogleCredential.fromStream(credStream)
 				.createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
@@ -71,8 +97,8 @@ public class GoogleSheetEventLog extends Thread implements EventLog {
 				.build();
 		start();
 	}
-	
-	public JSONObject getStatus(){
+
+	public JSONObject getStatus() {
 		return new JSONObject().put("queueSize", updates.size());
 	}
 
@@ -98,7 +124,7 @@ public class GoogleSheetEventLog extends Thread implements EventLog {
 
 	@Override
 	public void admin(final String user, final String action) throws IOException {
-		offer("Admin!A2", user!=null?user:"[unknown]", action);
+		offer("Admin!A2", user != null ? user : "[unknown]", action);
 	}
 
 	@Override
@@ -123,14 +149,7 @@ public class GoogleSheetEventLog extends Thread implements EventLog {
 	private void write(final String range, final List<Object> row) throws IOException {
 		final List<List<Object>> rows = Arrays.asList(row);
 		final ValueRange body = new ValueRange().setValues(rows);
-		final AppendValuesResponse result = service.spreadsheets().values().append(sheetID, range, body)
-				.setValueInputOption("RAW").execute();
+		service.spreadsheets().values().append(sheetID, range, body).setValueInputOption("RAW").execute();
 	}
 
-	public static void main(final String... args) throws IOException, GeneralSecurityException {
-		final String configFile = args.length == 1 ? args[0] : "/etc/door.json";
-		final JSONObject config = new JSONObject(new JSONTokener(new FileInputStream(configFile)));
-		final GoogleSheetEventLog el = new GoogleSheetEventLog(config.getJSONObject("google"));
-		el.offer("Sheet1!A2", "one", "thread", 4);
-	}
 }

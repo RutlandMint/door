@@ -7,7 +7,7 @@ $(function(){
 		var $mb = $("#js-memberList");
 		$mb.empty();
 		var _tLogRow = _.template("<tr class='<%-cl%>'><td><%-name%></td><td><%-id%></td><td><%-keyCardNumber%></td><td><%-level%></td><td><%-status%></td><td><%-signedWaiver%></td><td><%-signedAgreement%></td><td><%-denyMessage%></td></tr>");
-		_.each(res.members, function(entry) {
+		_.each(res, function(entry) {
 			if ( entry.accessGranted ){
 				entry.denyMessage = "";
 				entry.cl = "";

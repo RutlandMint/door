@@ -1,4 +1,4 @@
-package org.rutlandmakers.mgmt.door;
+package org.rutlandmint.mgmt.door;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -25,13 +25,16 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class WildApricot {
 	private static final Logger log = LoggerFactory.getLogger(WildApricot.class);
 
 	private final String apiKey;
 
-	public WildApricot(final String apiKey) {
+	public WildApricot(@Value("${wildApricot.apiKey}") final String apiKey) {
 		this.apiKey = apiKey;
 	}
 

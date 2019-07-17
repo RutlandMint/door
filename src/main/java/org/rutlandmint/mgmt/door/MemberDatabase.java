@@ -1,4 +1,4 @@
-package org.rutlandmakers.mgmt.door;
+package org.rutlandmint.mgmt.door;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,10 +13,15 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class MemberDatabase extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(MemberDatabase.class);
 
@@ -27,11 +32,17 @@ public class MemberDatabase extends Thread {
 	private Date listDate;
 	private boolean fromFile = true;
 
-	public MemberDatabase(final WildApricot wa, final File dbFile) {
+	public MemberDatabase(final WildApricot wa, @Value("${memberCache}") final File dbFile) {
 		this.wa = wa;
 		this.dbFile = dbFile;
 		setName("Database Load Thread");
 		setDaemon(true);
+	}
+
+	@Override
+	@PostConstruct
+	public void start() {
+		super.start();
 	}
 
 	@Override
@@ -99,6 +110,7 @@ public class MemberDatabase extends Thread {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private synchronized void loadFromFile() throws IOException {
 		if (!dbFile.exists()) {
 			throw new FileNotFoundException(dbFile.getAbsolutePath());

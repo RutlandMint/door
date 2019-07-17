@@ -1,4 +1,4 @@
-package org.rutlandmakers.mgmt.door;
+package org.rutlandmint.mgmt.door;
 
 import java.io.Serializable;
 import java.util.Optional;
