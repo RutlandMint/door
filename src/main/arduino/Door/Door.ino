@@ -33,7 +33,7 @@ void setup() {
 
   Serial.begin(115200);
 
-  Serial.println("#Starup");
+  Serial.println("#StarupV2");
 }
 
 long status = 0;
@@ -99,13 +99,6 @@ void cardRead(unsigned long facilityCode, unsigned long cardCode) {
     Serial.print("#SUPER_USER=");
     Serial.println(card);
     unlock();
-  } else if (digitalRead(4)) {
-    if (card >= 10010000 && card <= 10010099) {
-      //If Input 1, set all cards in box valid
-      Serial.print("#OVERRIDE=");
-      Serial.println(card);
-      unlock();
-    }
   }
   Serial.print("CARD=");
   Serial.println(card);
