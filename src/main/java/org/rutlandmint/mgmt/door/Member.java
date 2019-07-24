@@ -10,6 +10,10 @@ public class Member implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public static enum Override {
+		NONE, OPEN_24, NEVER
+	}
+
 	public final long id;
 	public final String name;
 	public final String email;
@@ -19,8 +23,8 @@ public class Member implements Serializable {
 	public final boolean afterHoursAccess;
 	public final boolean signedWaiver;
 	public final boolean signedAgreement;
+	public final Override override;
 
-	@Override
 	public String toString() {
 		return "Member [email=" + email + "]";
 	}
@@ -49,5 +53,19 @@ public class Member implements Serializable {
 				.orElse(false);
 		status = findField("Membership status", member).map(f -> f.getJSONObject("Value").getString("Value"))
 				.orElse("");
+		override = findField("Door Override", member)//
+				.filter(f -> f.has("Value"))//
+				.filter(f -> !f.isNull("Value"))//
+				.map(f -> f.getJSONObject("Value").getString("Label"))//
+				.map(l -> {
+					switch (l) {
+					case "Open 24 Hours":
+						return Override.OPEN_24;
+					case "Never Open":
+						return Override.NEVER;
+					default:
+						return Override.NONE;
+					}
+				}).orElse(Override.NONE);
 	}
 }

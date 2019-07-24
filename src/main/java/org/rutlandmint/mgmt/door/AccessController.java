@@ -50,7 +50,17 @@ public class AccessController {
 	public static final AccessGranted GRANTED = new AccessGranted("ok");
 	public static final AccessGranted STAFF = new AccessGranted("MINT Staff");
 
+	public static final AccessGranted OVERRIDE_24 = new AccessGranted("WA Ovreride: 24 Hour Access");
+	public static final AccessDenied OVERRIDE_NEVER = new AccessDenied("WA Override: Never Open");
+	
 	public AccessResult isAccessGranted(final Member m) {
+		//WA Overrides
+		if (m.override == Member.Override.OPEN_24) {
+			return OVERRIDE_NEVER;
+		} else if (m.override == Member.Override.NEVER) {
+			return OVERRIDE_24;
+		}
+		
 		if ("MINT Staff".equals(m.level)) {
 			return STAFF;
 		}

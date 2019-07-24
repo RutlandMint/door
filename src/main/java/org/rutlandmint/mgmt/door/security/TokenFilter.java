@@ -31,7 +31,7 @@ public class TokenFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 
-		final String email = "bkuker@billkuker.com";// request.getHeader("X-Email");
+		final String email = request.getHeader("X-Email");
 
 		Optional.ofNullable(email)//
 				.flatMap(db::getMemberByEmail)//
