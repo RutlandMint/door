@@ -56,9 +56,9 @@ public class AccessController {
 	public AccessResult isAccessGranted(final Member m) {
 		//WA Overrides
 		if (m.override == Member.Override.OPEN_24) {
-			return OVERRIDE_NEVER;
-		} else if (m.override == Member.Override.NEVER) {
 			return OVERRIDE_24;
+		} else if (m.override == Member.Override.NEVER) {
+			return OVERRIDE_NEVER;
 		}
 		
 		if ("MINT Staff".equals(m.level)) {
