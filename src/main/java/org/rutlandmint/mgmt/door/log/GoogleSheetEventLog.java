@@ -39,7 +39,7 @@ public class GoogleSheetEventLog extends Thread implements EventLog {
 	private static final String APPLICATION_NAME = "MINT Door Controller";
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
-	private static final SimpleDateFormat DATE_FMT = new SimpleDateFormat("d MMM yyyy HH:mm:ss z", Locale.US);
+	private static final SimpleDateFormat DATE_FMT = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.US);
 	static {
 		DATE_FMT.setTimeZone(TimeZone.getTimeZone("EST"));
 	}
