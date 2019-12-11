@@ -42,11 +42,6 @@
 		</dependency>
 		<!--  Utils -->
 		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20171018</version>
-		</dependency>
-		<dependency>
 		    <groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-json-org</artifactId>
 		</dependency>
