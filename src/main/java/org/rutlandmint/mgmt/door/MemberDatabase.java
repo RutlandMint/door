@@ -137,8 +137,11 @@ public class MemberDatabase extends Thread {
 			log.error("No members loaded in getMemberByAccessCard");
 			return Optional.empty();
 		}
-		return members.stream().filter(m -> cardNum.equals(m.keyCardNumber) || cardNum.equals("100" + m.keyCardNumber))
-				.findAny();
+		return members.stream().filter(m -> //
+				cardNum.equals(m.keyCardNumber) || //
+				cardNum.equals("100" + m.keyCardNumber) || //
+				cardNum.equals("131" + m.keyCardNumber) //
+		).findAny();
 	}
 
 	public synchronized Optional<Member> getMemberByEmail(final String email) {
