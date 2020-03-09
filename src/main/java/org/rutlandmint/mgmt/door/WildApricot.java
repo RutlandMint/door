@@ -62,7 +62,7 @@ public class WildApricot {
 		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
 			final String query = "'Key Card Number','After Hours Access','Signed Waiver On File','Signed Membership Agreement On File','Membership Status','Door Override'";
 			final HttpGet searchMembers = new HttpGet(
-					"https://api.wildapricot.org/v2/Accounts/241012/Contacts?$async=false&$filter=Archived%20eq%20false&$select="
+					"https://api.wildapricot.org/v2/Accounts/241012/Contacts?$async=false&$filter=Member%20eq%20true&$select="
 							+ URLEncoder.encode(query, "UTF-8"));
 			searchMembers.addHeader("Authorization", "Bearer " + getBearerToken());
 			try (CloseableHttpResponse resp = httpclient.execute(searchMembers)) {
