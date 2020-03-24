@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AccessController {
 
-	private boolean memberAccessEnabled = true;
+	private boolean memberAccessEnabled = false;
 
 	public static abstract class AccessResult {
 		private AccessResult(final String message) {
