@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.rutlandmint.mgmt</groupId>
 	<artifactId>door</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.6-SNAPSHOT</version>
 	<name>door</name>
 	<description>Demo project for Spring Boot</description>
 
