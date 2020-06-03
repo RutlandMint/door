@@ -69,7 +69,7 @@ public class MemberDatabase extends Thread {
 				.put("date", listDate.getTime());
 	}
 
-	private void doLoad() {
+	public synchronized void doLoad() {
 		if (members == null) {
 			try {
 				loadFromFile();

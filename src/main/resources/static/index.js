@@ -92,6 +92,13 @@ $(function() {
 		loadAccessLog();
 	}
 
+	$("#js-buttonReloadMembers").click(function() {
+		$.ajax({
+			url : 'reloadMembers.do',
+			type : "POST"
+		}).then(load);
+	});
+	
 	$("#js-buttonDisable").click(function() {
 		$.ajax({
 			url : 'disable.do',
